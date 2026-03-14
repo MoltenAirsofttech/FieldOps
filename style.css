@@ -46,7 +46,7 @@ header nav button:hover {
 /* Hero Section */
 .hero {
     position: relative;
-    background: url('download (1).webp') center/cover no-repeat;
+    background: url('result_download (1).webp') center/cover no-repeat;
     height: 90vh;
     display: flex;
     align-items: center;
