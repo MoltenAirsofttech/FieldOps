@@ -1,121 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Field Ops</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login / Signup - Field Ops</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Header -->
-    <div id="header-placeholder"></div>
 
-    <!-- Main content: LOGIN / SIGNUP FORM -->
-    <main style="min-height: 60vh; display:flex; justify-content:center; align-items:center; color:#fff; flex-direction:column; padding:20px;">
-        <div id="authContainer" style="text-align:center; max-width:400px; width:100%;">
-            <h2>Sign Up / Log In</h2>
+<!-- Header -->
+<div id="header-placeholder"></div>
 
-            <!-- Signup inputs -->
-            <input id="signupEmail" type="email" placeholder="Email" style="width:100%; padding:8px; margin:5px 0; border-radius:6px;">
-            <input id="signupPass" type="password" placeholder="Password" style="width:100%; padding:8px; margin:5px 0; border-radius:6px;">
-            <input id="signupDisplayName" type="text" placeholder="Display Name" style="width:100%; padding:8px; margin:5px 0; border-radius:6px;">
-            <button id="signupBtn" style="padding:8px 12px; margin:5px;">Sign Up</button>
+<!-- Main Login Content -->
+<main id="mainContent">
+  <div id="authContainer" style="color:white; text-align:center; font-family:Arial; max-width:400px; margin:50px auto;">
+    <h2>Sign Up / Log In</h2>
 
-            <hr style="margin:20px 0; border-color:#555;">
+    <!-- Signup inputs -->
+    <input id="signupEmail" type="email" placeholder="Email" style="width:100%; padding:8px; margin:5px 0; border-radius:6px;">
+    <input id="signupPass" type="password" placeholder="Password" style="width:100%; padding:8px; margin:5px 0; border-radius:6px;">
+    <input id="signupDisplayName" type="text" placeholder="Display Name" style="width:100%; padding:8px; margin:5px 0; border-radius:6px;">
+    <button id="signupBtn" style="padding:8px 12px; margin:5px;">Sign Up</button>
 
-            <!-- Login inputs -->
-            <input id="loginEmail" type="email" placeholder="Email" style="width:100%; padding:8px; margin:5px 0; border-radius:6px;">
-            <input id="loginPass" type="password" placeholder="Password" style="width:100%; padding:8px; margin:5px 0; border-radius:6px;">
-            <button id="loginBtn" style="padding:8px 12px; margin:5px;">Log In</button>
+    <hr style="margin:20px 0; border-color:#555;">
 
-            <div id="authMessage" style="margin-top:10px;"></div>
-        </div>
+    <!-- Login inputs -->
+    <input id="loginEmail" type="email" placeholder="Email" style="width:100%; padding:8px; margin:5px 0; border-radius:6px;">
+    <input id="loginPass" type="password" placeholder="Password" style="width:100%; padding:8px; margin:5px 0; border-radius:6px;">
+    <button id="loginBtn" style="padding:8px 12px; margin:5px;">Log In</button>
 
-        <div id="welcomeContainer" style="display:none; text-align:center; max-width:400px; margin-top:20px;">
-            <h2>Welcome!</h2>
-            <p id="welcomeText"></p>
-            <button id="logoutBtn" style="padding:8px 12px; margin-top:10px;">Log Out</button>
-        </div>
-    </main>
+    <div id="authMessage" style="margin-top:10px;"></div>
+  </div>
 
-    <!-- Footer -->
-    <div id="footer-placeholder"></div>
+  <div id="welcomeContainer" style="display:none; color:white; text-align:center; font-family:Arial; max-width:400px; margin:50px auto;">
+    <h2>Welcome!</h2>
+    <p id="welcomeText"></p>
+    <button id="logoutBtn" style="padding:8px 12px; margin-top:10px;">Log Out</button>
+  </div>
+</main>
 
-    <!-- JS to load header and footer -->
-    <script>
-        fetch('header.html')
-            .then(response => response.text())
-            .then(data => document.getElementById('header-placeholder').innerHTML = data);
+<!-- Footer -->
+<div id="footer-placeholder"></div>
 
-        fetch('footer.html')
-            .then(response => response.text())
-            .then(data => document.getElementById('footer-placeholder').innerHTML = data);
-    </script>
+<!-- Header / Footer JS -->
+<script>
+fetch('header.html')
+  .then(r => r.text())
+  .then(d => document.getElementById('header-placeholder').innerHTML = d);
+fetch('footer.html')
+  .then(r => r.text())
+  .then(d => document.getElementById('footer-placeholder').innerHTML = d);
+</script>
 
-    <!-- FIREBASE SCRIPTS -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<!-- Firebase Auth -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyClEyiSXHQ4Tjo8hUKpjlgbGz3Y9fw8ddg",
+    authDomain: "fieldops0.firebaseapp.com",
+    projectId: "fieldops0",
+    databaseURL: "https://fieldops0-default-rtdb.firebaseio.com",
+    storageBucket: "fieldops0.appspot.com",
+    messagingSenderId: "368782923118",
+    appId: "1:368782923118:web:71f392fee8c46fe1209d7f"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
 
-    <script>
-        // --- Firebase Setup ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyClEyiSXHQ4Tjo8hUKpjlgbGz3Y9fw8ddg",
-            authDomain: "fieldops0.firebaseapp.com",
-            projectId: "fieldops0",
-            databaseURL: "https://fieldops0-default-rtdb.firebaseio.com",
-            storageBucket: "fieldops0.appspot.com",
-            messagingSenderId: "368782923118",
-            appId: "1:368782923118:web:71f392fee8c46fe1209d7f"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
+  const authContainer = document.getElementById('authContainer');
+  const welcomeContainer = document.getElementById('welcomeContainer');
+  const welcomeText = document.getElementById('welcomeText');
+  const authMessage = document.getElementById('authMessage');
 
-        const authContainer = document.getElementById('authContainer');
-        const welcomeContainer = document.getElementById('welcomeContainer');
-        const welcomeText = document.getElementById('welcomeText');
-        const authMessage = document.getElementById('authMessage');
+  document.getElementById('signupBtn').onclick = () => {
+    const email = document.getElementById('signupEmail').value;
+    const pass = document.getElementById('signupPass').value;
+    const displayName = document.getElementById('signupDisplayName').value.trim();
+    if(!displayName) return authMessage.innerText = "❌ Please enter a display name.";
+    auth.createUserWithEmailAndPassword(email, pass)
+      .then(u => u.user.updateProfile({ displayName }))
+      .then(() => authMessage.innerText = "✅ Signed up successfully!")
+      .catch(err => authMessage.innerText = `❌ ${err.message}`);
+  };
 
-        // --- SIGN UP ---
-        document.getElementById('signupBtn').onclick = () => {
-            const email = document.getElementById('signupEmail').value;
-            const pass = document.getElementById('signupPass').value;
-            const displayName = document.getElementById('signupDisplayName').value.trim();
-            if (!displayName) return authMessage.innerText = "❌ Please enter a display name.";
-            auth.createUserWithEmailAndPassword(email, pass)
-                .then(userCred => userCred.user.updateProfile({ displayName }))
-                .then(() => { authMessage.innerText = "✅ Signed up successfully!"; })
-                .catch(err => authMessage.innerText = `❌ ${err.message}`);
-        };
+  document.getElementById('loginBtn').onclick = () => {
+    const email = document.getElementById('loginEmail').value;
+    const pass = document.getElementById('loginPass').value;
+    auth.signInWithEmailAndPassword(email, pass)
+      .then(() => authMessage.innerText = "✅ Logged in successfully!")
+      .catch(err => authMessage.innerText = `❌ ${err.message}`);
+  };
 
-        // --- LOG IN ---
-        document.getElementById('loginBtn').onclick = () => {
-            const email = document.getElementById('loginEmail').value;
-            const pass = document.getElementById('loginPass').value;
-            auth.signInWithEmailAndPassword(email, pass)
-                .then(() => { authMessage.innerText = "✅ Logged in successfully!"; })
-                .catch(err => authMessage.innerText = `❌ ${err.message}`);
-        };
+  document.getElementById('logoutBtn').onclick = () => {
+    auth.signOut().then(() => {
+      authContainer.style.display='block';
+      welcomeContainer.style.display='none';
+    });
+  };
 
-        // --- LOG OUT ---
-        document.getElementById('logoutBtn').onclick = () => {
-            auth.signOut().then(() => {
-                authContainer.style.display = 'block';
-                welcomeContainer.style.display = 'none';
-            });
-        };
-
-        // --- Persistent login / Auth state ---
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                authContainer.style.display = 'none';
-                welcomeContainer.style.display = 'block';
-                welcomeText.innerText = `Hello, ${user.displayName || "User"} (${user.email})`;
-            } else {
-                authContainer.style.display = 'block';
-                welcomeContainer.style.display = 'none';
-            }
-        });
-    </script>
+  auth.onAuthStateChanged(user => {
+    if(user){
+      authContainer.style.display='none';
+      welcomeContainer.style.display='block';
+      welcomeText.innerText = `Hello, ${user.displayName || "User"} (${user.email})`;
+    } else {
+      authContainer.style.display='block';
+      welcomeContainer.style.display='none';
+    }
+  });
+</script>
 </body>
 </html>
