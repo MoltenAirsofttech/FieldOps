@@ -41,20 +41,21 @@ header {
 header nav {
     display: flex;
     gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
-header nav button {
+header nav a {
     background: linear-gradient(90deg, #ff6b00, #ff3c00);
-    border: none;
     color: #fff;
     padding: 0.6rem 1.2rem;
     border-radius: 5px;
-    cursor: pointer;
     font-weight: bold;
+    text-decoration: none;
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
-header nav button:hover {
+header nav a:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(255, 108, 0, 0.5);
 }
@@ -67,8 +68,6 @@ header nav button:hover {
     align-items: center;
     justify-content: flex-start;
     padding-left: 5%;
-
-    /* Original small image centered on top */
     background: url('Screenshot 2026-03-14 140800.png') center center no-repeat;
     background-size: contain;
     z-index: 1;
@@ -142,9 +141,5 @@ footer a:hover {
     }
     .hero-content {
         max-width: 90%;
-    }
-    header nav {
-        flex-wrap: wrap;
-        justify-content: center;
     }
 }
