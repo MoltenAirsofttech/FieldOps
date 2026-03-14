@@ -1,160 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Field Finder - Field Ops</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <style>
-    body, html { margin:0; padding:0; height:100%; overflow:hidden; }
-    #pageContainer { display:flex; height:100vh; width:100vw; }
-    #sidebar { width:250px; background:#111; color:white; padding:10px; box-sizing:border-box; overflow-y:auto; }
-    #mapContainer { flex:1; position:relative; }
-    #map { width:100%; height:100%; }
-    #mapSearch { position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:1001; width:320px; padding:10px; border-radius:8px; border:1px solid #555; background:#111; color:white; font-size:16px; box-shadow:0 0 6px #000; }
-    #filterContainer { position:absolute; bottom:60px; left:10px; z-index:1000; background:rgba(255,255,255,0.9); padding:10px; border-radius:8px; display:flex; flex-wrap:wrap; gap:4px; max-width:90%; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Finder - Field Ops</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 <body>
-  <!-- Header -->
-  <div id="header-placeholder"></div>
 
-  <!-- Main content -->
-  <div id="pageContainer">
-    <!-- Sidebar for Google Ads -->
-    <div id="sidebar">
-      <h3>Advertisements</h3>
-      <!-- Example ad -->
-      <div style="margin-bottom:20px; background:#222; height:120px; display:flex; align-items:center; justify-content:center;">Your Ad Here</div>
-      <div style="margin-bottom:20px; background:#222; height:120px; display:flex; align-items:center; justify-content:center;">Your Ad Here</div>
-      <!-- Add more ad slots as needed -->
+<!-- Header -->
+<div id="header-placeholder"></div>
+
+<!-- Page Container -->
+<div id="pageContainer" style="min-height:90vh;">
+  <!-- Ads Sidebar -->
+  <aside id="adsSidebar">
+    <h3 style="color:#FFA500;">Ads</h3>
+    <p>Place your Google ads here</p>
+  </aside>
+
+  <!-- Main Map Content -->
+  <main id="mainContent">
+    <div id="map" style="width:100%; height:90vh;"></div>
+    <div style="position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:1001; width:320px;">
+      <input id="mapSearch" type="text" placeholder="Search location..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #555; background:#111; color:white; font-size:16px;">
     </div>
+    <div id="filterContainer" style="position:absolute; bottom:60px; left:10px; z-index:1000; background:rgba(255,255,255,0.9); padding:10px; border-radius:8px; display:flex; flex-wrap:wrap; gap:4px;"></div>
+  </main>
+</div>
 
-    <!-- Map area -->
-    <div id="mapContainer">
-      <div id="map"></div>
-      <input id="mapSearch" type="text" placeholder="Search location...">
-      <div id="filterContainer"></div>
-    </div>
-  </div>
+<!-- Footer -->
+<div id="footer-placeholder"></div>
 
-  <!-- Footer -->
-  <div id="footer-placeholder"></div>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- JS to load header and footer -->
-  <script>
-    fetch('header.html')
-      .then(res=>res.text())
-      .then(data=>document.getElementById('header-placeholder').innerHTML=data);
+<script>
+fetch('header.html')
+  .then(r => r.text())
+  .then(d => document.getElementById('header-placeholder').innerHTML = d);
+fetch('footer.html')
+  .then(r => r.text())
+  .then(d => document.getElementById('footer-placeholder').innerHTML = d);
+</script>
 
-    fetch('footer.html')
-      .then(res=>res.text())
-      .then(data=>document.getElementById('footer-placeholder').innerHTML=data);
-  </script>
-
-  <!-- Libraries -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-database-compat.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- Map Script (your existing code adapted) -->
-  <script>
-  (function() {
-    const firebaseConfig = {
-      apiKey: "AIzaSyClEyiSXHQ4Tjo8hUKpjlgbGz3Y9fw8ddg",
-      authDomain: "fieldops0.firebaseapp.com",
-      databaseURL: "https://fieldops0-default-rtdb.firebaseio.com",
-      projectId: "fieldops0",
-      storageBucket: "fieldops0.appspot.com",
-      messagingSenderId: "368782923118",
-      appId: "1:368782923118:web:71f392fee8c46fe1209d7f"
-    };
-    firebase.initializeApp(firebaseConfig);
-
-    const auth = firebase.auth();
-    const db = firebase.database();
-    let currentUser = null;
-    let locations = [];
-    let markers = [];
-    const categoryColors = { "Airsoft Field":"blue", "Paintball Field":"red", "Store":"green", "Event":"orange" };
-    let activeCategories = new Set(Object.keys(categoryColors));
-
-    const map = L.map('map', { zoomControl:false }).setView([25,-80],5);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
-      attribution:'&copy; OpenStreetMap &copy; CARTO',subdomains:'abcd',maxZoom:19
-    }).addTo(map);
-    L.control.zoom({position:'bottomright'}).addTo(map);
-
-    auth.onAuthStateChanged(user => { currentUser=user||null; loadFields(); });
-
-    async function loadFields() {
-      const snap = await db.ref('fields').once('value');
-      const data = snap.val()||{};
-      locations = Object.keys(data).map(k=>({id:k,...data[k]}));
-      renderFilters();
-      renderMarkers();
-    }
-
-    function createMarker(field) {
-      const tags = field.tags||[];
-      const size = tags.includes("featured")?18:12;
-      const htmlSlices = tags.map(tag=>`<div style="flex:1;background:${categoryColors[tag]||'gray'}"></div>`).join('');
-      const iconHtml = `<div style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;display:flex;border:1px solid white;">${htmlSlices}</div>`;
-      const marker = L.marker([field.latitude,field.longitude],{
-        icon:L.divIcon({className:'multi-circle',html:iconHtml,iconSize:[size,size],iconAnchor:[size/2,size/2]})
-      });
-      marker.bindPopup(`<div style="width:220px;font-family:Arial;"><strong>${field.name}</strong><br><em>${field.avgPlayers||0} players (avg)</em><p>${field.desc||''}</p></div>`);
-      return marker;
-    }
-
-    function renderMarkers() {
-      markers.forEach(m => map.removeLayer(m));
-      markers = [];
-      locations.forEach(field => {
-        const tags = field.tags || [];
-        const visible = tags.some(tag => activeCategories.has(tag));
-        if(visible){ 
-          const marker = createMarker(field); 
-          marker.addTo(map); 
-          markers.push(marker);
-        }
-      });
-    }
-
-    function renderFilters() {
-      const container = document.getElementById('filterContainer');
-      container.innerHTML='';
-      Object.keys(categoryColors).forEach(tag=>{
-        const btn=document.createElement('button');
-        btn.innerText=tag;
-        btn.style.background=activeCategories.has(tag)?categoryColors[tag]:'#ccc';
-        btn.style.color=tag==='Event'?'black':'white';
-        btn.style.border='none';
-        btn.style.borderRadius='4px';
-        btn.style.padding='4px 8px';
-        btn.onclick=()=> {
-          activeCategories.has(tag)?activeCategories.delete(tag):activeCategories.add(tag);
-          renderFilters();
-          renderMarkers();
-        };
-        container.appendChild(btn);
-      });
-    }
-
-    document.getElementById('mapSearch').addEventListener('keypress',async e=>{
-      if(e.key==='Enter'){
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(e.target.value)}`);
-        const data = await res.json();
-        if(data[0]) map.setView([+data[0].lat,+data[0].lon],10);
-      }
-    });
-
-  })();
-  </script>
-
+<!-- Map JS (same as your previous map script) -->
+<script src="fieldmap-script.js"></script>
 </body>
 </html>
