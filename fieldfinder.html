@@ -6,62 +6,46 @@
 <title>Field Map - Field Ops</title>
 
 <link rel="stylesheet" href="style.css">
-
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-
-<style>
-body{
-    margin:0;
-    background:#0f1114;
-}
-
-#map{
-    width:100vw;
-    height:100vh;
-}
-</style>
 </head>
 
 <body>
 
 <header>
-<nav>
-<a href="index.html">Home</a>
-<a href="fieldmap.html">Field Map</a>
-<a href="groupfinder.html">Group Finder</a>
-<a href="fieldpass.html">Field Pass</a>
-<a href="login.html">Login / Signup</a>
-</nav>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="fieldmap.html">Field Map</a>
+        <a href="groupfinder.html">Group Finder</a>
+        <a href="fieldpass.html">Field Pass</a>
+        <a href="login.html">Login / Signup</a>
+    </nav>
 </header>
 
 <main>
+    <div class="pageLayout">
 
-<div class="layout">
+        <div class="sidePanel"></div>
 
-    <div class="adPanel"></div>
+        <div class="mapWrapper">
 
-    <div class="mapContainer">
+            <div id="map"></div>
 
-        <div id="map"></div>
+            <div class="mapSearch">
+                <input id="mapSearch" type="text" placeholder="Search location...">
+            </div>
 
-        <div class="searchBox">
-            <input id="mapSearch" type="text" placeholder="Search location...">
+            <div id="filterContainer"></div>
+
         </div>
 
-        <div id="filterContainer"></div>
+        <div class="sidePanel"></div>
 
     </div>
-
-    <div class="adPanel"></div>
-
-</div>
-
 </main>
 
 <footer>
-<p>© Field Ops — Placeholder Footer</p>
+    <p>© Field Ops — Placeholder Footer</p>
 </footer>
-
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
@@ -70,234 +54,114 @@ body{
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-(function() {
+(function(){
 
-const firebaseConfig = {
-apiKey: "AIzaSyClEyiSXHQ4Tjo8hUKpjlgbGz3Y9fw8ddg",
-authDomain: "fieldops0.firebaseapp.com",
-databaseURL: "https://fieldops0-default-rtdb.firebaseio.com",
-projectId: "fieldops0",
-storageBucket: "fieldops0.appspot.com",
-messagingSenderId: "368782923118",
-appId: "1:368782923118:web:71f392fee8c46fe1209d7f"
+const firebaseConfig={
+    apiKey:"AIzaSyClEyiSXHQ4Tjo8hUKpjlgbGz3Y9fw8ddg",
+    authDomain:"fieldops0.firebaseapp.com",
+    databaseURL:"https://fieldops0-default-rtdb.firebaseio.com",
+    projectId:"fieldops0",
+    storageBucket:"fieldops0.appspot.com",
+    messagingSenderId:"368782923118",
+    appId:"1:368782923118:web:71f392fee8c46fe1209d7f"
 };
 
 firebase.initializeApp(firebaseConfig);
 
-const auth = firebase.auth();
-const db = firebase.database();
+const auth=firebase.auth();
+const db=firebase.database();
 
 let currentUser = null;
 let locations = [];
 let markers = [];
 
-const categoryColors = {
-"Airsoft Field":"blue",
-"Paintball Field":"red",
-"Store":"green",
-"Event":"orange"
+const categoryColors={
+    "Airsoft Field":"blue",
+    "Paintball Field":"red",
+    "Store":"green",
+    "Event":"orange"
 };
 
-let activeCategories = new Set(Object.keys(categoryColors));
+let activeCategories=new Set(Object.keys(categoryColors));
 
-const map = L.map('map',{zoomControl:false}).setView([25,-80],5);
+const map=L.map("map",{zoomControl:false}).setView([25,-80],5);
 
 L.tileLayer(
-'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-{
-attribution:'© OpenStreetMap © CARTO',
-subdomains:'abcd',
-maxZoom:19
-}).addTo(map);
+    "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    {
+        attribution:"© OpenStreetMap © CARTO",
+        subdomains:"abcd",
+        maxZoom:19
+    }
+).addTo(map);
 
-L.control.zoom({position:'bottomright'}).addTo(map);
+L.control.zoom({position:"bottomright"}).addTo(map);
 
-auth.onAuthStateChanged(user=>{
-currentUser=user||null;
-loadFields();
+auth.onAuthStateChanged(user => {
+    currentUser = user || null;
+    loadFields();
 });
 
 async function loadFields(){
-const snap = await db.ref('fields').once('value');
-const data = snap.val()||{};
-locations = Object.keys(data).map(k=>({id:k,...data[k]}));
-renderFilters();
-renderMarkers();
+    const snap = await db.ref("fields").once("value");
+    const data = snap.val() || {};
+    locations = Object.keys(data).map(k => ({id:k,...data[k]}));
+    renderFilters();
+    renderMarkers();
 }
 
 function createMarker(field){
-
-const tags = field.tags||[];
-const size = tags.includes("featured")?18:12;
-
-const htmlSlices = tags.map(tag=>
-`<div style="flex:1;background:${categoryColors[tag]||'gray'}"></div>`
-).join('');
-
-const iconHtml =
-`<div style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;display:flex;border:1px solid white;">${htmlSlices}</div>`;
-
-const marker = L.marker(
-[field.latitude,field.longitude],
-{
-icon:L.divIcon({
-className:'multi-circle',
-html:iconHtml,
-iconSize:[size,size],
-iconAnchor:[size/2,size/2]
-})
-});
-
-marker.bindPopup(`
-<div style="width:220px;font-family:Arial;">
-<strong>${field.name}</strong><br>
-<em>${field.avgPlayers||0} players (avg)</em>
-<p>${field.desc||''}</p>
-<button id="viewAnalyticsBtn" style="width:100%; padding:6px; border-radius:6px; background:#222; color:white; border:1px solid #555;">View Analytics</button>
-</div>
-`);
-
-marker.on('popupopen',()=>{
-const btn=document.getElementById('viewAnalyticsBtn');
-if(btn) btn.onclick=()=>showAnalytics(field);
-});
-
-return marker;
+    const tags = field.tags || [];
+    const size = tags.includes("featured")?18:12;
+    const htmlSlices = tags.map(tag => `<div style="flex:1;background:${categoryColors[tag]||"gray"}"></div>`).join("");
+    const iconHtml = `<div style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;display:flex;border:1px solid white;">${htmlSlices}</div>`;
+    return L.marker([field.latitude, field.longitude], {
+        icon: L.divIcon({
+            className:"multi-circle",
+            html: iconHtml,
+            iconSize:[size,size],
+            iconAnchor:[size/2,size/2]
+        })
+    });
 }
 
 function renderMarkers(){
-
-markers.forEach(m=>map.removeLayer(m));
-markers=[];
-
-locations.forEach(field=>{
-
-const tags = field.tags || [];
-
-const visible = tags.some(tag=>activeCategories.has(tag));
-
-if(visible){
-
-const marker = createMarker(field);
-
-marker.addTo(map);
-
-markers.push(marker);
-
-}
-
-});
-
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+    locations.forEach(field => {
+        const visible = (field.tags||[]).some(tag => activeCategories.has(tag));
+        if(visible){
+            const marker = createMarker(field);
+            marker.addTo(map);
+            markers.push(marker);
+        }
+    });
 }
 
 function renderFilters(){
+    const container = document.getElementById("filterContainer");
+    container.innerHTML = "";
+    Object.keys(categoryColors).forEach(tag => {
+        const btn = document.createElement("button");
+        btn.innerText = tag;
+        btn.style.background = activeCategories.has(tag)?categoryColors[tag]:"#ccc";
+        btn.style.color = tag==="Event"?"black":"white";
+        btn.onclick = () => {
+            activeCategories.has(tag) ? activeCategories.delete(tag) : activeCategories.add(tag);
+            renderFilters();
+            renderMarkers();
+        };
+        container.appendChild(btn);
+    });
+}
 
-const container=document.getElementById('filterContainer');
-
-container.innerHTML='';
-
-Object.keys(categoryColors).forEach(tag=>{
-
-const btn=document.createElement('button');
-
-btn.innerText=tag;
-
-btn.style.background=activeCategories.has(tag)?categoryColors[tag]:'#ccc';
-
-btn.style.color=tag==='Event'?'black':'white';
-
-btn.style.border='none';
-
-btn.style.borderRadius='4px';
-
-btn.style.padding='4px 8px';
-
-btn.onclick=()=>{
-
-activeCategories.has(tag)
-?activeCategories.delete(tag)
-:activeCategories.add(tag);
-
-renderFilters();
-
-renderMarkers();
-
-};
-
-container.appendChild(btn);
-
+document.getElementById("mapSearch").addEventListener("keypress", async e => {
+    if(e.key === "Enter"){
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(e.target.value)}`);
+        const data = await res.json();
+        if(data[0]) map.setView([+data[0].lat,+data[0].lon],10);
+    }
 });
-
-}
-
-document.getElementById('mapSearch').addEventListener('keypress',async e=>{
-
-if(e.key==='Enter'){
-
-const res = await fetch(
-`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(e.target.value)}`
-);
-
-const data = await res.json();
-
-if(data[0]) map.setView([+data[0].lat,+data[0].lon],10);
-
-}
-
-});
-
-async function showAnalytics(field){
-
-if(!currentUser){
-alert('Login required');
-return;
-}
-
-const hasMembership = (
-await db.ref(`users/${currentUser.uid}/membership/active`).once('value')
-).val();
-
-if(!hasMembership){
-alert('Membership required');
-return;
-}
-
-const modal=document.createElement('div');
-
-modal.id='analyticsModal';
-
-modal.style.cssText=`
-position:fixed;
-top:0;
-left:0;
-width:100vw;
-height:100vh;
-background:#111;
-z-index:9999;
-padding:20px;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-overflow:auto;
-`;
-
-modal.innerHTML=`
-<button id="closeAnalytics" style="position:absolute;top:20px;left:20px;padding:10px 15px;background:#222;color:white;border:none;border-radius:6px;font-size:16px;">Back to Map</button>
-<h2 style="color:white;text-align:center;margin-top:0;margin-bottom:20px;">${field.name} Analytics</h2>
-<div style="display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;gap:20px;">
-<canvas id="avgPlayers" width="300" height="300"></canvas>
-<canvas id="playersPerDay" width="300" height="300"></canvas>
-<canvas id="playersPerHour" width="300" height="300"></canvas>
-<canvas id="combinedChart" width="300" height="300"></canvas>
-</div>
-`;
-
-document.body.appendChild(modal);
-
-document.getElementById('closeAnalytics').onclick=()=>modal.remove();
-
-}
 
 })();
 </script>
