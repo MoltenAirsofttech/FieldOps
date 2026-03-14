@@ -13,7 +13,8 @@ body {
     min-height: 100vh;
     color: #fff;
     position: relative;
-    overflow: hidden;
+    /* allow scrolling */
+    overflow-y: auto;
     background-color: #0f111a;
 }
 
@@ -64,7 +65,7 @@ header nav a:hover {
 /* Hero Section */
 .hero {
     position: relative;
-    height: 90vh;
+    min-height: 90vh;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -116,6 +117,8 @@ footer {
     padding: 2rem;
     text-align: center;
     z-index: 2;
+    /* always appear after content */
+    flex-shrink: 0;
 }
 
 footer p {
@@ -132,7 +135,50 @@ footer a:hover {
     text-decoration: underline;
 }
 
+/* Group Finder / Map wrapper adjustments */
+#pageContainer {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    /* allow height to grow naturally */
+}
+
+#adsSidebar {
+    width: 300px;
+    flex-shrink: 0;
+    padding: 20px;
+    background: rgba(0,0,0,0.6);
+}
+
+#mainContent {
+    flex: 1;
+    display: flex;
+    justify-content: center; /* center horizontally */
+    align-items: flex-start; /* align top */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#groupFinderWrapper {
+    max-width: 960px;
+    width: 100%;
+}
+
 /* Responsive */
+@media (max-width: 1024px) {
+    #pageContainer {
+        flex-direction: column;
+    }
+    #adsSidebar {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    #mainContent {
+        justify-content: center;
+        align-items: center;
+    }
+}
+
 @media (max-width: 768px) {
     .hero {
         justify-content: center;
