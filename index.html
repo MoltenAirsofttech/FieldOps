@@ -8,17 +8,8 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="groupfinder.html">Group Finder</a>
-            <a href="fieldpass.html">Field Access</a>
-            <a href="blogs.html">Blogs</a>
-            <a href="fieldfinder.html">Field Finder</a>
-            <a href="login-signup.html">Login/SignUp</a>
-        </nav>
-    </header>
+    <!-- Header will load here -->
+    <div id="header-placeholder"></div>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -29,14 +20,20 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer>
-        <p>© 2026 Field Ops. All rights reserved.</p>
-        <p>
-            <a href="#">About</a> | 
-            <a href="#">Contact</a> | 
-            <a href="#">Privacy Policy</a>
-        </p>
-    </footer>
+    <!-- Footer will load here -->
+    <div id="footer-placeholder"></div>
+
+    <!-- JS to load header and footer -->
+    <script>
+        // Load header
+        fetch('header.html')
+            .then(response => response.text())
+            .then(data => document.getElementById('header-placeholder').innerHTML = data);
+
+        // Load footer
+        fetch('footer.html')
+            .then(response => response.text())
+            .then(data => document.getElementById('footer-placeholder').innerHTML = data);
+    </script>
 </body>
 </html>
