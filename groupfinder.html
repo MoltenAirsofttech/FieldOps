@@ -1,67 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Group Finder - Field Ops</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-<style>
-  html, body { height:100%; margin:0; padding:0; overflow:auto; }
-  #pageContainer { display:flex; min-height:90vh; }
-  #adsSidebar { width:200px; background: rgba(0,0,0,0.7); padding:10px; color:white; font-family:Arial; }
-  #mainContent { flex:1; position:relative; padding:20px; }
-  #wrapper { max-width:800px; margin:0 auto; }
-  #notLoggedIn { max-width:400px; margin:50px auto; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Group Finder - Field Ops</title>
+  <link href="style.css" rel="stylesheet">
 </head>
 <body>
+  <!-- Header -->
+  <div id="header-placeholder"></div>
 
-<!-- Header -->
-<div id="header-placeholder"></div>
-
-<div id="pageContainer">
-  <!-- Ads Sidebar -->
-  <div id="adsSidebar">
-    <h3>Ads</h3>
-    <p>Place your Google ads here</p>
-  </div>
-
-  <!-- Main Group Finder -->
-  <div id="mainContent">
-    <div id="version" style="position:fixed;top:10px;left:10px;color:#FFA500;font-weight:bold;z-index:9999;">v4.3</div>
-
-    <div id="notLoggedIn" style="display:none;text-align:center;margin-top:40px;color:white;">
-      <p>You need to login/signup to use Group Finder.</p>
-      <button id="goLoginBtn" style="padding:8px 12px;background:#FFA500;border:none;color:#111;font-weight:bold;cursor:pointer;border-radius:4px;">Go to Login</button>
+  <div class="pageContainer">
+    <div id="adsSidebar">
+      <h3>Ads</h3>
+      <p>Google Ads here</p>
     </div>
+    <div id="mainContent">
+      <div id="version">v4.3</div>
 
-    <div id="wrapper" style="display:none;color:white;font-family:'Arial', sans-serif;">
-      <h2 style="color:#FFA500;text-align:center;margin-bottom:20px;">Group Finder</h2>
-      <input id="searchInput" placeholder="Search fields..." style="width:100%;padding:10px;margin-bottom:20px;border-radius:8px;border:1px solid #555;background:#2a2a2a;color:white;font-size:16px;">
-      <ul id="results" style="list-style:none;padding:0;"></ul>
+      <div id="notLoggedIn">
+        <p>You need to login/signup to use Group Finder.</p>
+        <button id="goLoginBtn" onclick="location.href='login-signup.html'">Go to Login</button>
+      </div>
+
+      <div id="wrapper"></div>
     </div>
   </div>
-</div>
 
-<!-- Footer -->
-<div id="footer-placeholder"></div>
+  <!-- Footer -->
+  <div id="footer-placeholder"></div>
 
-<script>
-fetch('header.html').then(r=>r.text()).then(d=>document.getElementById('header-placeholder').innerHTML=d);
-fetch('footer.html').then(r=>r.text()).then(d=>document.getElementById('footer-placeholder').innerHTML=d);
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="groupfinder-script.js"></script>
 
-document.getElementById('goLoginBtn').onclick = () => {
-  window.location.href = "login-signup.html";
-};
-</script>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
-<script>
-// Your full Group Finder Firebase JS goes here
-</script>
+  <script>
+    fetch('header.html').then(r => r.text()).then(d => document.getElementById('header-placeholder').innerHTML = d);
+    fetch('footer.html').then(r => r.text()).then(d => document.getElementById('footer-placeholder').innerHTML = d);
+  </script>
 </body>
 </html>
