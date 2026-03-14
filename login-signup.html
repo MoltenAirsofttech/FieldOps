@@ -1,33 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Placeholder - Field Ops</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Field Ops Login</title>
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    input, button {
+      font-size: 16px;
+    }
+    hr {
+      border-color: #555;
+    }
+  </style>
 </head>
 <body>
-    <!-- Header -->
-    <div id="header-placeholder"></div>
 
-    <!-- Main content placeholder -->
-    <main style="min-height: 60vh; display:flex; justify-content:center; align-items:center; color:#fff;">
-        <h2>Content coming soon...</h2>
-    </main>
+  <!-- LOGIN / SIGNUP FORM -->
+  <div id="authContainer" style="color:white; text-align:center; max-width:400px; margin:50px auto;">
+    <h2>Sign Up / Log In</h2>
 
-    <!-- Footer -->
-    <div id="footer-placeholder"></div>
+    <!-- Signup inputs -->
+    <input id="signupEmail" type="email" placeholder="Email" style="width:100%; padding:8px; margin:5px 0; border-radius:6px;">
+    <input id="signupPass" type="password" placeholder="Password" style="width:100%; padding:8px; margin:5px 0; border-radius:6px;">
+    <input id="signupDisplayName" type="text" placeholder="Display Name" style="width:100%; padding:8px; margin:5px 0; border-radius:6px;">
+    <button id="signupBtn" style="padding:8px 12px; margin:5px;">Sign Up</button>
 
-    <!-- JS to load header and footer -->
-    <script>
-        fetch('header.html')
-            .then(response => response.text())
-            .then(data => document.getElementById('header-placeholder').innerHTML = data);
+    <hr style="margin:20px 0; border-color:#555;">
 
-        fetch('footer.html')
-            .then(response => response.text())
-            .then(data => document.getElementById('footer-placeholder').innerHTML = data);
-    </script>
+    <!-- Login inputs -->
+    <input id="loginEmail" type="email" placeholder="Email" style="width:100%; padding:8px; margin:5px 0; border-radius:6px;">
+    <input id="loginPass" type="password" placeholder="Password" style="width:100%; padding:8px; margin:5px 0; border-radius:6px;">
+    <button id="loginBtn" style="padding:8px 12px; margin:5px;">Log In</button>
+
+    <div id="authMessage" style="margin-top:10px;"></div>
+  </div>
+
+  <!-- WELCOME CONTAINER -->
+  <div id="welcomeContainer" style="display:none; color:white; text-align:center; max-width:400px; margin:50px auto;">
+    <h2>Welcome!</h2>
+    <p id="welcomeText"></p>
+    <button id="logoutBtn" style="padding:8px 12px; margin-top:10px;">Log Out</button>
+  </div>
+
+  <!-- FIREBASE SCRIPTS -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+  <script>
+    // --- Firebase Setup ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyClEyiSXHQ4Tjo8hUKpjlgbGz3Y9fw8ddg",
+      authDomain: "fieldops0.firebaseapp.com",
+      projectId: "fieldops0",
+      databaseURL: "https://fieldops0-default-rtdb.firebaseio.com",
+      storageBucket: "fieldops0.appspot.com",
+      messagingSenderId: "368782923118",
+      appId: "1:368782923118:web:71f392fee8c46fe1209d7f"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    const authContainer = document.getElementById('authContainer');
+    const welcomeContainer = document.getElementById('welcomeContainer');
+    const welcomeText = document.getElementById('welcomeText');
+    const authMessage = document.getElementById('authMessage');
+
+    // --- SIGN UP ---
+    document.getElementById('signupBtn').onclick = () => {
+      const email = document.getElementById('signupEmail').value;
+      const pass = document.getElementById('signupPass').value;
+      const displayName = document.getElementById('signupDisplayName').value.trim();
+
+      if (!displayName) return authMessage.innerText = "❌ Please enter a display name.";
+
+      auth.createUserWithEmailAndPassword(email, pass)
+        .then(userCred => {
+          return userCred.user.updateProfile({ displayName });
+        })
+        .then(() => {
+          authMessage.innerText = "✅ Signed up successfully!";
+        })
+        .catch(err => authMessage.innerText = `❌ ${err.message}`);
+    };
+
+    // --- LOG IN ---
+    document.getElementById('loginBtn').onclick = () => {
+      const email = document.getElementById('loginEmail').value;
+      const pass = document.getElementById('loginPass').value;
+
+      auth.signInWithEmailAndPassword(email, pass)
+        .then(userCred => {
+          authMessage.innerText = "✅ Logged in successfully!";
+        })
+        .catch(err => authMessage.innerText = `❌ ${err.message}`);
+    };
+
+    // --- LOG OUT ---
+    document.getElementById('logoutBtn').onclick = () => {
+      auth.signOut().then(() => {
+        authContainer.style.display = 'block';
+        welcomeContainer.style.display = 'none';
+      });
+    };
+
+    // --- Persistent login / Auth state ---
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        authContainer.style.display = 'none';
+        welcomeContainer.style.display = 'block';
+        welcomeText.innerText = `Hello, ${user.displayName || "User"} (${user.email})`;
+      } else {
+        authContainer.style.display = 'block';
+        welcomeContainer.style.display = 'none';
+      }
+    });
+  </script>
+
 </body>
 </html>
