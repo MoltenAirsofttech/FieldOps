@@ -14,7 +14,7 @@ body {
     color: #fff;
 
     /* Background image */
-    background-image: url('result_download (1).webp'); /* replace with your image path */
+    background-image: url('download (1).webp'); /* replace with your image path */
     background-size: cover;      /* scales while keeping aspect ratio */
     background-position: center; /* keeps center in view */
     background-repeat: no-repeat; /* prevents tiling */
