@@ -1,186 +1,257 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Group Finder - Field Ops</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body, html { margin:0; padding:0; height:100%; font-family:'Roboto',sans-serif; background:#111; color:white; }
-    #pageContainer { display:flex; min-height:100vh; }
-    #sidebar { width:250px; background:#111; padding:10px; box-sizing:border-box; overflow-y:auto; }
-    #mainContent { flex:1; padding:20px; box-sizing:border-box; display:flex; justify-content:center; align-items:flex-start; overflow-y:auto; }
-    #groupFinderWrapper { max-width:960px; width:100%; }
-    #version { position:fixed; top:10px; left:10px; color:#FFA500; font-weight:bold; z-index:9999; }
-    #notLoggedIn { text-align:center; margin-top:40px; color:white; }
-    input, select, button { font-family:'Arial',sans-serif; }
-    ul { list-style:none; padding:0; margin:0; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Group Finder - Field Ops</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  body {
+    margin:0;
+    padding:0;
+    background:#111;
+    color:white;
+    font-family:'Roboto', sans-serif;
+  }
+
+  #pageContainer {
+    display:flex;
+    min-height:100vh;
+  }
+
+  /* Sidebar for ads */
+  #sidebar {
+    width:240px;
+    background:#1a1a1a;
+    padding:20px;
+    box-sizing:border-box;
+  }
+
+  #mainContent {
+    flex:1;
+    display:flex;
+    justify-content:center;   /* centers the wrapper horizontally */
+    align-items:flex-start;   /* aligns to top */
+    padding:20px;
+    box-sizing:border-box;
+    overflow-y:auto;
+  }
+
+  #groupFinderWrapper {
+    max-width:960px;
+    width:100%;
+    margin:0 auto;  /* ensures wrapper stays centered */
+  }
+
+  #notLoggedIn {
+    text-align:center;
+    margin-top:40px;
+  }
+
+  #version {
+    position:fixed;
+    top:10px;
+    left:10px;
+    color:#FFA500;
+    font-weight:bold;
+    z-index:9999;
+  }
+
+  #wrapper input, #wrapper select {
+    width:100%;
+    box-sizing:border-box;
+  }
+
+  #wrapper ul {
+    list-style:none;
+    padding:0;
+  }
+</style>
 </head>
 <body>
-  <!-- Header -->
-  <div id="header-placeholder"></div>
 
-  <!-- Main page layout -->
-  <div id="pageContainer">
-    <!-- Sidebar for Ads -->
-    <div id="sidebar">
-      <h3>Advertisements</h3>
-      <div style="margin-bottom:20px; background:#222; height:120px; display:flex; align-items:center; justify-content:center;">Your Ad Here</div>
-      <div style="margin-bottom:20px; background:#222; height:120px; display:flex; align-items:center; justify-content:center;">Your Ad Here</div>
-    </div>
-
-    <!-- Main content -->
-    <div id="mainContent">
-      <div id="groupFinderWrapper">
-        <!-- Version tag -->
-        <div id="version">v4.3</div>
-
-        <!-- Not logged in message -->
-        <div id="notLoggedIn" style="display:none;">
-          <p>You need to login/signup to use Group Finder.</p>
-          <button id="goLoginBtn" style="padding:8px 12px;background:#FFA500;border:none;color:#111;font-weight:bold;cursor:pointer;border-radius:4px;">Go to Login</button>
-        </div>
-
-        <!-- Group finder content -->
-        <div id="wrapper" style="display:none;color:white;font-family:'Arial', sans-serif;">
-          <h2 style="color:#FFA500;text-align:center;margin-bottom:20px;">Group Finder</h2>
-          <input id="searchInput" placeholder="Search fields..." style="width:100%;padding:10px;margin-bottom:20px;border-radius:8px;border:1px solid #555;background:#2a2a2a;color:white;font-size:16px;">
-          <ul id="results"></ul>
-        </div>
-      </div>
-    </div>
+<!-- Sidebar for Ads -->
+<div id="pageContainer">
+  <div id="sidebar">
+    <h3>Advertisements</h3>
+    <div style="margin-bottom:20px; background:#222; height:120px; display:flex; align-items:center; justify-content:center;">Your Ad Here</div>
+    <div style="margin-bottom:20px; background:#222; height:120px; display:flex; align-items:center; justify-content:center;">Your Ad Here</div>
   </div>
 
-  <!-- Footer -->
-  <div id="footer-placeholder"></div>
+  <!-- Main content -->
+  <div id="mainContent">
+    <div id="groupFinderWrapper">
 
-  <!-- Load header/footer -->
-  <script>
-    fetch('header.html')
-      .then(res=>res.text())
-      .then(data=>document.getElementById('header-placeholder').innerHTML=data);
+      <!-- Version -->
+      <div id="version">v4.3</div>
 
-    fetch('footer.html')
-      .then(res=>res.text())
-      .then(data=>document.getElementById('footer-placeholder').innerHTML=data);
-  </script>
+      <!-- Not logged in -->
+      <div id="notLoggedIn">
+        <p>You need to login/signup to use Group Finder.</p>
+        <button id="goLoginBtn" style="padding:8px 12px;background:#FFA500;border:none;color:#111;font-weight:bold;cursor:pointer;border-radius:4px;">
+          Go to Login
+        </button>
+      </div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+      <!-- Group Finder content -->
+      <div id="wrapper" style="display:none;color:white;font-family:'Arial', sans-serif;">
+        <h2 style="color:#FFA500;text-align:center;margin-bottom:20px;">Group Finder</h2>
+        <input id="searchInput" placeholder="Search fields..." style="width:100%;padding:10px;margin-bottom:20px;border-radius:8px;border:1px solid #555;background:#2a2a2a;color:white;font-size:16px;">
+        <ul id="results"></ul>
+      </div>
 
-  <!-- Group Finder Script -->
-  <script>
-  (function() {
-    const firebaseConfig = {
-      apiKey: "AIzaSyClEyiSXHQ4Tjo8hUKpjlgbGz3Y9fw8ddg",
-      authDomain: "fieldops0.firebaseapp.com",
-      databaseURL: "https://fieldops0-default-rtdb.firebaseio.com",
-      projectId: "fieldops0"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const auth = firebase.auth();
+    </div>
+  </div>
+</div>
 
-    const wrapper = document.getElementById('wrapper');
-    const notLoggedIn = document.getElementById('notLoggedIn');
-    const goLoginBtn = document.getElementById('goLoginBtn');
-    const searchInput = document.getElementById('searchInput');
-    const resultsList = document.getElementById('results');
+<!-- Firebase & Group Finder scripts -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
-    let currentUser = null;
-    let userRole = null;
+<script>
+(function() {
+  const firebaseConfig = {
+    apiKey: "AIzaSyClEyiSXHQ4Tjo8hUKpjlgbGz3Y9fw8ddg",
+    authDomain: "fieldops0.firebaseapp.com",
+    databaseURL: "https://fieldops0-default-rtdb.firebaseio.com",
+    projectId: "fieldops0"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const auth = firebase.auth();
 
-    auth.onAuthStateChanged(async user => {
-      if(!user){
-        wrapper.style.display='none';
-        notLoggedIn.style.display='block';
-        goLoginBtn.onclick = () => { window.location.href='login-signup.html'; };
-        return;
-      }
-      currentUser = user;
-      const roleSnap = await db.ref('roles/roles/' + user.uid).once('value');
-      userRole = roleSnap.val();
-      notLoggedIn.style.display='none';
-      wrapper.style.display='block';
-      loadFields();
+  const wrapper = document.getElementById('wrapper');
+  const notLoggedIn = document.getElementById('notLoggedIn');
+  const searchInput = document.getElementById('searchInput');
+  const resultsList = document.getElementById('results');
+  const goLoginBtn = document.getElementById('goLoginBtn');
+
+  let currentUser = null;
+  let userRole = null;
+
+  // Go to login page
+  goLoginBtn.onclick = () => {
+    window.location.href = "login-signup.html";
+  };
+
+  auth.onAuthStateChanged(async user => {
+    if(!user){
+      wrapper.style.display='none';
+      notLoggedIn.style.display='block';
+      return;
+    }
+    currentUser = user;
+    const roleSnap = await db.ref('roles/roles/' + user.uid).once('value');
+    userRole = roleSnap.val();
+    notLoggedIn.style.display='none';
+    wrapper.style.display='block';
+    loadFields();
+  });
+
+  let allFields = [];
+
+  function loadFields() {
+    db.ref('fields').on('value', snap => {
+      allFields = [];
+      const fields = snap.val() || {};
+      Object.keys(fields).forEach(fid => {
+        const f = fields[fid];
+        f.id = fid;
+        allFields.push(f);
+      });
+      renderFields('');
     });
+    searchInput.oninput = e => renderFields(e.target.value);
+  }
 
-    let allFields = [];
+  function renderFields(query){
+    resultsList.innerHTML='';
+    const q = (query||'').toLowerCase();
 
-    function loadFields() {
-      db.ref('fields').on('value', snap => {
-        allFields = [];
-        const fields = snap.val() || {};
-        Object.keys(fields).forEach(fid => {
-          const f = fields[fid];
-          f.id = fid;
-          allFields.push(f);
+    allFields.forEach(f => {
+      if(q && !f.name.toLowerCase().includes(q)) return;
+
+      const li = document.createElement('li');
+      li.style.border='1px solid #444';
+      li.style.padding='16px';
+      li.style.marginBottom='20px';
+      li.style.background='linear-gradient(145deg, #1f1f1f, #2a2a2a)';
+      li.style.borderRadius='12px';
+      li.style.boxShadow='0 5px 15px rgba(0,0,0,0.7)';
+      li.style.transition='transform 0.2s, box-shadow 0.2s';
+      li.onmouseover = () => { li.style.transform='scale(1.02)'; li.style.boxShadow='0 8px 20px rgba(0,0,0,0.8)'; };
+      li.onmouseleave = () => { li.style.transform='scale(1)'; li.style.boxShadow='0 5px 15px rgba(0,0,0,0.7)'; };
+
+      li.innerHTML = `
+        <strong style="color:#FFA500;font-size:1.4em;">${f.name}</strong><br>
+        <span style="color:#ccc;font-size:0.95em;">${f.desc||''}</span><br>
+        Avg Players: <span style="color:#FFA500;">${f.avgPlayers||0}</span><br><br>
+
+        <input placeholder="Group Name" id="gn-${f.id}" style="padding:8px;width:60%;margin-top:6px;border-radius:6px;border:1px solid #555;background:#333;color:white;font-size:14px;"><br>
+        <input type="number" id="ps-${f.id}" placeholder="# of people in party" min="1" style="padding:8px;width:60%;margin-top:6px;border-radius:6px;border:1px solid #555;background:#333;color:white;font-size:14px;"><br>
+        <input type="date" id="gd-${f.id}" style="padding:8px;margin-top:6px;border-radius:6px;border:1px solid #555;background:#333;color:white;font-size:14px;"><br>
+        <input type="time" id="gt-${f.id}" style="padding:8px;margin-top:6px;border-radius:6px;border:1px solid #555;background:#333;color:white;font-size:14px;"><br>
+        <select id="gz-${f.id}" style="padding:8px;margin-top:6px;border-radius:6px;border:1px solid #555;background:#333;color:white;font-size:14px;">
+          <option value="UTC">UTC</option>
+          <option value="EST">EST</option>
+          <option value="CST">CST</option>
+          <option value="MST">MST</option>
+          <option value="PST">PST</option>
+        </select><br>
+        <button id="create-${f.id}" style="padding:10px 16px;margin-top:8px;background:#FFA500;color:#111;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">Create Group</button>
+
+        <div id="groups-${f.id}" style="margin-top:18px;"></div>
+      `;
+      resultsList.appendChild(li);
+
+      document.getElementById(`create-${f.id}`).onclick = () => {
+        const gid = Date.now().toString();
+        const minAttending = parseInt(document.getElementById(`ps-${f.id}`).value || 1);
+        const attendees = {};
+        attendees[currentUser.uid] = minAttending;
+        db.ref('groups/'+gid).set({
+          fieldId: f.id,
+          groupName: document.getElementById(`gn-${f.id}`).value,
+          date: document.getElementById(`gd-${f.id}`).value,
+          time: document.getElementById(`gt-${f.id}`).value,
+          timezone: document.getElementById(`gz-${f.id}`).value,
+          creatorDisplayName: currentUser.displayName || currentUser.email,
+          creatorUid: currentUser.uid,
+          attendees,
+          messages: {}
         });
-        renderFields('');
+      };
+
+      loadGroups(f.id);
+    });
+  }
+
+  function isAdmin(){
+    return userRole === 'admin' || userRole === 'owner';
+  }
+
+  function loadGroups(fid){
+    const container = document.getElementById(`groups-${fid}`);
+    db.ref('groups').orderByChild('fieldId').equalTo(fid).on('value', snap => {
+      container.innerHTML='<div style="margin-bottom:12px;"><b style="color:#FFA500;font-size:1.1em;">Active Groups</b></div>';
+      const groups = snap.val() || {};
+      Object.keys(groups).forEach(gid => {
+        const g = groups[gid];
+        const div = document.createElement('div');
+        div.style.borderTop='1px solid #555';
+        div.style.padding='10px';
+        div.style.marginTop='16px';
+        div.style.background='linear-gradient(90deg,#2a2a2a,#1f1f1f)';
+        div.style.borderRadius='10px';
+        div.style.boxShadow='0 3px 12px rgba(0,0,0,0.6)';
+        div.style.position='relative';
+        container.appendChild(div);
       });
-      searchInput.oninput = e => renderFields(e.target.value);
-    }
-
-    function renderFields(query){
-      resultsList.innerHTML='';
-      const q = (query||'').toLowerCase();
-      allFields.forEach(f => {
-        if(q && !f.name.toLowerCase().includes(q)) return;
-        const li = document.createElement('li');
-        li.style.border='1px solid #444';
-        li.style.padding='16px';
-        li.style.marginBottom='20px';
-        li.style.background='linear-gradient(145deg, #1f1f1f, #2a2a2a)';
-        li.style.borderRadius='12px';
-        li.style.boxShadow='0 5px 15px rgba(0,0,0,0.7)';
-        li.style.transition='transform 0.2s, box-shadow 0.2s';
-        li.onmouseover = () => { li.style.transform='scale(1.02)'; li.style.boxShadow='0 8px 20px rgba(0,0,0,0.8)'; };
-        li.onmouseleave = () => { li.style.transform='scale(1)'; li.style.boxShadow='0 5px 15px rgba(0,0,0,0.7)'; };
-        li.innerHTML = `
-          <strong style="color:#FFA500;font-size:1.4em;">${f.name}</strong><br>
-          <span style="color:#ccc;font-size:0.95em;">${f.desc||''}</span><br>
-          Avg Players: <span style="color:#FFA500;">${f.avgPlayers||0}</span><br><br>
-
-          <input placeholder="Group Name" id="gn-${f.id}" style="padding:8px;width:60%;margin-top:6px;border-radius:6px;border:1px solid #555;background:#333;color:white;font-size:14px;"><br>
-          <input type="number" id="ps-${f.id}" placeholder="# of people in party" min="1" style="padding:8px;width:60%;margin-top:6px;border-radius:6px;border:1px solid #555;background:#333;color:white;font-size:14px;"><br>
-          <input type="date" id="gd-${f.id}" style="padding:8px;margin-top:6px;border-radius:6px;border:1px solid #555;background:#333;color:white;font-size:14px;"><br>
-          <input type="time" id="gt-${f.id}" style="padding:8px;margin-top:6px;border-radius:6px;border:1px solid #555;background:#333;color:white;font-size:14px;"><br>
-          <select id="gz-${f.id}" style="padding:8px;margin-top:6px;border-radius:6px;border:1px solid #555;background:#333;color:white;font-size:14px;">
-            <option value="UTC">UTC</option>
-            <option value="EST">EST</option>
-            <option value="CST">CST</option>
-            <option value="MST">MST</option>
-            <option value="PST">PST</option>
-          </select><br>
-          <button id="create-${f.id}" style="padding:10px 16px;margin-top:8px;background:#FFA500;color:#111;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">Create Group</button>
-          <div id="groups-${f.id}" style="margin-top:18px;"></div>
-        `;
-        resultsList.appendChild(li);
-        document.getElementById(`create-${f.id}`).onclick = () => {
-          const gid = Date.now().toString();
-          const minAttending = parseInt(document.getElementById(`ps-${f.id}`).value || 1);
-          const attendees = {};
-          attendees[currentUser.uid] = minAttending;
-          db.ref('groups/'+gid).set({
-            fieldId: f.id,
-            groupName: document.getElementById(`gn-${f.id}`).value,
-            date: document.getElementById(`gd-${f.id}`).value,
-            time: document.getElementById(`gt-${f.id}`).value,
-            timezone: document.getElementById(`gz-${f.id}`).value,
-            creatorDisplayName: currentUser.displayName || currentUser.email,
-            creatorUid: currentUser.uid,
-            attendees,
-            messages: {}
-          });
-        };
-      });
-    }
-
-  })();
-  </script>
+    });
+  }
+})();
+</script>
 </body>
 </html>
