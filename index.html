@@ -1,37 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Field Ops - Airsoft & Paintball Finder</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Field Ops - Home</title>
+  <link href="style.css" rel="stylesheet">
 </head>
 <body class="home">
-    <!-- Header -->
-    <div id="header-placeholder"></div>
+  <!-- Header -->
+  <div id="header-placeholder"></div>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h2>Find Local Fields and Events Near You</h2>
-            <p>FieldOps links airsofters & paintballers to local fields and events, fostering community and camaraderie. Join today to celebrate action and teamwork!</p>
-            <button>Find Fields / Events Near You</button>
-        </div>
-    </section>
+  <!-- Bottom-right box -->
+  <div id="homeBox">
+    <h2>Welcome to Field Ops</h2>
+    <p>Find airsoft and paintball fields quickly.</p>
+    <button onclick="location.href='fieldfinder.html'">Go to Field Finder</button>
+  </div>
 
-    <!-- Footer -->
-    <div id="footer-placeholder"></div>
+  <!-- Footer -->
+  <div id="footer-placeholder"></div>
 
-    <!-- JS to load header and footer -->
-    <script>
-        fetch('header.html')
-            .then(response => response.text())
-            .then(data => document.getElementById('header-placeholder').innerHTML = data);
+  <script>
+    fetch('header.html')
+      .then(r => r.text())
+      .then(d => document.getElementById('header-placeholder').innerHTML = d);
 
-        fetch('footer.html')
-            .then(response => response.text())
-            .then(data => document.getElementById('footer-placeholder').innerHTML = data);
-    </script>
+    fetch('footer.html')
+      .then(r => r.text())
+      .then(d => document.getElementById('footer-placeholder').innerHTML = d);
+  </script>
 </body>
 </html>
