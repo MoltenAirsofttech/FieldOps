@@ -9,7 +9,15 @@
 </head>
 <body>
     <!-- Header -->
-    <div id="header-placeholder"></div>
+    <header>
+        <nav>
+            <button>Group Finder</button>
+            <button>Field Access</button>
+            <button>Blogs</button>
+            <button>Field Finder</button>
+            <button>Menu</button>
+        </nav>
+    </header>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -21,17 +29,13 @@
     </section>
 
     <!-- Footer -->
-    <div id="footer-placeholder"></div>
-
-    <!-- JS to load header and footer -->
-    <script>
-        fetch('header.html')
-            .then(response => response.text())
-            .then(data => document.getElementById('header-placeholder').innerHTML = data);
-
-        fetch('footer.html')
-            .then(response => response.text())
-            .then(data => document.getElementById('footer-placeholder').innerHTML = data);
-    </script>
+    <footer>
+        <p>© 2026 Field Ops. All rights reserved.</p>
+        <p>
+            <a href="#">About</a> | 
+            <a href="#">Contact</a> | 
+            <a href="#">Privacy Policy</a>
+        </p>
+    </footer>
 </body>
 </html>
