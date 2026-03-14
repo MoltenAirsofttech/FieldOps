@@ -3,34 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Field Ops - Airsoft & Paintball Finder</title>
+    <title>Page Placeholder - Field Ops</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Header will load here -->
+    <!-- Header -->
     <div id="header-placeholder"></div>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h2>Find Local Fields and Events Near You</h2>
-            <p>FieldOps links airsofters & paintballers to local fields and events, fostering community and camaraderie. Join today to celebrate action and teamwork!</p>
-            <button>Find Fields / Events Near You</button>
-        </div>
-    </section>
+    <!-- Main content placeholder -->
+    <main style="min-height: 60vh; display:flex; justify-content:center; align-items:center; color:#fff;">
+        <h2>Content coming soon...</h2>
+    </main>
 
-    <!-- Footer will load here -->
+    <!-- Footer -->
     <div id="footer-placeholder"></div>
 
     <!-- JS to load header and footer -->
     <script>
-        // Load header
         fetch('header.html')
             .then(response => response.text())
             .then(data => document.getElementById('header-placeholder').innerHTML = data);
 
-        // Load footer
         fetch('footer.html')
             .then(response => response.text())
             .then(data => document.getElementById('footer-placeholder').innerHTML = data);
