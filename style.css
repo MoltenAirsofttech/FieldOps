@@ -6,20 +6,28 @@
     font-family: 'Roboto', sans-serif;
 }
 
+/* Full-page background */
 body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background-color: #0f111a; /* fallback color if image fails */
+    background-color: #0f111a; /* fallback color */
     color: #fff;
+
+    /* Full-page background image */
+    background-image: url('download (1).webp'); /* replace with your image path */
+    background-size: cover;      /* keeps aspect ratio, fills screen */
+    background-position: center; /* centers the image */
+    background-repeat: no-repeat; /* no tiling */
 }
 
 /* Header */
 header {
-    background-color: #1c1c1c;
+    background-color: rgba(28, 28, 28, 0.85); /* slightly transparent to show background */
     display: flex;
     justify-content: center;
     padding: 1rem 0;
+    z-index: 2;
 }
 
 header nav {
@@ -51,11 +59,7 @@ header nav button:hover {
     align-items: center;
     justify-content: flex-start;
     padding-left: 5%;
-        /* Background image */
-    background-image: url('download (1).webp'); /* replace with your image path */
-    background-size: cover;      /* scales while keeping aspect ratio */
-    background-position: center; /* keeps center in view */
-    background-repeat: no-repeat; /* prevents tiling */
+    background: transparent; /* show full-body background */
 }
 
 .hero-content {
@@ -63,6 +67,7 @@ header nav button:hover {
     padding: 2rem;
     border-radius: 15px;
     max-width: 400px;
+    z-index: 2;
 }
 
 .hero-content h2 {
@@ -94,10 +99,11 @@ header nav button:hover {
 
 /* Footer */
 footer {
-    background-color: #1c1c1c;
+    background-color: rgba(28, 28, 28, 0.85); /* slightly transparent */
     color: #fff;
     padding: 2rem;
     text-align: center;
+    z-index: 2;
 }
 footer p {
     margin-bottom: 0.5rem;
