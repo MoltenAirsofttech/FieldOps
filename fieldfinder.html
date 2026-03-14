@@ -3,27 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Field Ops Map</title>
+  <title>Field Finder - Field Ops</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body, html { margin:0; padding:0; height:100%; overflow:hidden; }
+    #pageContainer { display:flex; height:100vh; width:100vw; }
+    #sidebar { width:250px; background:#111; color:white; padding:10px; box-sizing:border-box; overflow-y:auto; }
+    #mapContainer { flex:1; position:relative; }
+    #map { width:100%; height:100%; }
+    #mapSearch { position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:1001; width:320px; padding:10px; border-radius:8px; border:1px solid #555; background:#111; color:white; font-size:16px; box-shadow:0 0 6px #000; }
+    #filterContainer { position:absolute; bottom:60px; left:10px; z-index:1000; background:rgba(255,255,255,0.9); padding:10px; border-radius:8px; display:flex; flex-wrap:wrap; gap:4px; max-width:90%; }
+  </style>
 </head>
 <body>
   <!-- Header -->
   <div id="header-placeholder"></div>
 
-  <!-- Main content: MAP -->
-  <main style="position:relative; min-height:100vh;">
-    <div id="map" style="width:100vw; height:100vh;"></div>
-
-    <!-- Search input -->
-    <div style="position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:1001; width:320px;">
-      <input id="mapSearch" type="text" placeholder="Search location..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #555; background:#111; color:white; font-size:16px; box-shadow:0 0 6px #000;">
+  <!-- Main content -->
+  <div id="pageContainer">
+    <!-- Sidebar for Google Ads -->
+    <div id="sidebar">
+      <h3>Advertisements</h3>
+      <!-- Example ad -->
+      <div style="margin-bottom:20px; background:#222; height:120px; display:flex; align-items:center; justify-content:center;">Your Ad Here</div>
+      <div style="margin-bottom:20px; background:#222; height:120px; display:flex; align-items:center; justify-content:center;">Your Ad Here</div>
+      <!-- Add more ad slots as needed -->
     </div>
 
-    <!-- Filter container -->
-    <div id="filterContainer" style="position:absolute; bottom:60px; left:10px; z-index:1000; background:rgba(255,255,255,0.9); padding:10px; border-radius:8px; display:flex; flex-wrap:wrap; gap:4px;"></div>
-  </main>
+    <!-- Map area -->
+    <div id="mapContainer">
+      <div id="map"></div>
+      <input id="mapSearch" type="text" placeholder="Search location...">
+      <div id="filterContainer"></div>
+    </div>
+  </div>
 
   <!-- Footer -->
   <div id="footer-placeholder"></div>
@@ -31,25 +46,24 @@
   <!-- JS to load header and footer -->
   <script>
     fetch('header.html')
-      .then(response => response.text())
-      .then(data => document.getElementById('header-placeholder').innerHTML = data);
+      .then(res=>res.text())
+      .then(data=>document.getElementById('header-placeholder').innerHTML=data);
 
     fetch('footer.html')
-      .then(response => response.text())
-      .then(data => document.getElementById('footer-placeholder').innerHTML = data);
+      .then(res=>res.text())
+      .then(data=>document.getElementById('footer-placeholder').innerHTML=data);
   </script>
 
-  <!-- LIBRARIES -->
+  <!-- Libraries -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-database-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- MAP SCRIPT -->
+  <!-- Map Script (your existing code adapted) -->
   <script>
   (function() {
-
     const firebaseConfig = {
       apiKey: "AIzaSyClEyiSXHQ4Tjo8hUKpjlgbGz3Y9fw8ddg",
       authDomain: "fieldops0.firebaseapp.com",
@@ -63,7 +77,6 @@
 
     const auth = firebase.auth();
     const db = firebase.database();
-
     let currentUser = null;
     let locations = [];
     let markers = [];
@@ -91,38 +104,22 @@
       const size = tags.includes("featured")?18:12;
       const htmlSlices = tags.map(tag=>`<div style="flex:1;background:${categoryColors[tag]||'gray'}"></div>`).join('');
       const iconHtml = `<div style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;display:flex;border:1px solid white;">${htmlSlices}</div>`;
-
       const marker = L.marker([field.latitude,field.longitude],{
         icon:L.divIcon({className:'multi-circle',html:iconHtml,iconSize:[size,size],iconAnchor:[size/2,size/2]})
       });
-
-      marker.bindPopup(`
-        <div style="width:220px;font-family:Arial;">
-          <strong>${field.name}</strong><br>
-          <em>${field.avgPlayers||0} players (avg)</em>
-          <p>${field.desc||''}</p>
-          <button id="viewAnalyticsBtn" style="width:100%; padding:6px; border-radius:6px; background:#222; color:white; border:1px solid #555;">View Analytics</button>
-        </div>
-      `);
-
-      marker.on('popupopen', () => {
-        const btn = document.getElementById('viewAnalyticsBtn');
-        if(btn) btn.onclick = ()=> showAnalytics(field);
-      });
-
+      marker.bindPopup(`<div style="width:220px;font-family:Arial;"><strong>${field.name}</strong><br><em>${field.avgPlayers||0} players (avg)</em><p>${field.desc||''}</p></div>`);
       return marker;
     }
 
     function renderMarkers() {
       markers.forEach(m => map.removeLayer(m));
       markers = [];
-
       locations.forEach(field => {
         const tags = field.tags || [];
         const visible = tags.some(tag => activeCategories.has(tag));
-        if (visible) {
-          const marker = createMarker(field);
-          marker.addTo(map);
+        if(visible){ 
+          const marker = createMarker(field); 
+          marker.addTo(map); 
           markers.push(marker);
         }
       });
@@ -155,120 +152,6 @@
         if(data[0]) map.setView([+data[0].lat,+data[0].lon],10);
       }
     });
-
-    async function showAnalytics(field) {
-      if(!currentUser){ alert('Login required'); return; }
-      const hasMembership = (await db.ref(`users/${currentUser.uid}/membership/active`).once('value')).val();
-      if(!hasMembership){ alert('Membership required'); return; }
-
-      const modal = document.createElement('div');
-      modal.id = 'analyticsModal';
-      modal.style.cssText = `
-        position:fixed;
-        top:0;
-        left:0;
-        width:100vw;
-        height:100vh;
-        background:#111;
-        z-index:9999;
-        padding:20px;
-        box-sizing:border-box;
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        justify-content:center;
-        overflow:auto;
-      `;
-
-      modal.innerHTML = `
-        <button id="closeAnalytics" style="
-          position:absolute;
-          top:20px;
-          left:20px;
-          padding:10px 15px;
-          background:#222;
-          color:white;
-          border:none;
-          border-radius:6px;
-          font-size:16px;
-          cursor:pointer;
-        ">Back to Map</button>
-        <h2 style="color:white;text-align:center;margin-top:0;margin-bottom:20px;">${field.name} Analytics</h2>
-        <div style="
-          display:grid;
-          grid-template-columns:auto auto;
-          grid-template-rows:auto auto;
-          gap:20px;
-          justify-content:center;
-          align-items:center;
-        ">
-          <canvas id="avgPlayers" width="300" height="300"></canvas>
-          <canvas id="playersPerDay" width="300" height="300"></canvas>
-          <canvas id="playersPerHour" width="300" height="300"></canvas>
-          <canvas id="combinedChart" width="300" height="300"></canvas>
-        </div>
-      `;
-
-      document.body.appendChild(modal);
-      document.getElementById('closeAnalytics').onclick = () => modal.remove();
-
-      const reports = field.reports ? Object.values(field.reports) : [];
-      const totalReports = reports.length;
-      if(!totalReports) return;
-
-      const avgPlayers = reports.reduce((a,b)=>a+b.players,0)/totalReports;
-      const highestPlayers = Math.max(...reports.map(r=>r.players));
-
-      const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-      const daySums = Array(7).fill(0);
-      const dayCounts = Array(7).fill(0);
-      const hourSums = Array(24).fill(0);
-      const hourCounts = Array(24).fill(0);
-
-      reports.forEach(r=>{
-        const d = new Date(r.timestamp);
-        const day = d.getDay();
-        const h = d.getHours();
-        daySums[day] += r.players;
-        dayCounts[day] += 1;
-        hourSums[h] += r.players;
-        hourCounts[h] += 1;
-      });
-
-      const dayAverages = daySums.map((sum,i)=> dayCounts[i]?sum/dayCounts[i]:0);
-      const hourAverages = hourSums.map((sum,i)=> hourCounts[i]?sum/hourCounts[i]:0);
-
-      const hourLabels = [...Array(24).keys()].map(h=>{
-        const hour = h % 12 === 0 ? 12 : h % 12;
-        const ampm = h < 12 ? 'AM' : 'PM';
-        return hour + ' ' + ampm;
-      });
-
-      new Chart(document.getElementById('avgPlayers'),{
-        type:'doughnut',
-        data:{labels:['Average Players'],datasets:[{data:[avgPlayers],backgroundColor:['green']}]},
-        options:{plugins:{legend:{labels:{color:'white'}},title:{display:true,text:`Average Players (Max ${highestPlayers})`,color:'white'}},circumference:180,rotation:-90}
-      });
-
-      new Chart(document.getElementById('playersPerDay'),{
-        type:'bar',
-        data:{labels:days,datasets:[{label:'Players per Day',data:dayAverages,backgroundColor:'orange'}]},
-        options:{plugins:{legend:{labels:{color:'white'}},title:{display:true,text:'Players Per Day',color:'white'}},scales:{y:{beginAtZero:true,ticks:{color:'white'}},x:{ticks:{color:'white'}}}}
-      });
-
-      new Chart(document.getElementById('playersPerHour'),{
-        type:'line',
-        data:{labels:hourLabels,datasets:[{label:'Players per Hour',data:hourAverages,borderColor:'lime',fill:false,tension:0.3}]},
-        options:{plugins:{legend:{labels:{color:'white'}},title:{display:true,text:'Players Per Hour',color:'white'}},scales:{y:{beginAtZero:true,ticks:{color:'white'}},x:{ticks:{color:'white'}}}}
-      });
-
-      new Chart(document.getElementById('combinedChart'),{
-        type:'bar',
-        data:{labels:['Avg','Sun','Mon','Tue','Wed','Thu','Fri','Sat'],datasets:[{label:'Players',data:[avgPlayers,...dayAverages],backgroundColor:'purple'}]},
-        options:{plugins:{legend:{labels:{color:'white'}},title:{display:true,text:'Combined Metrics',color:'white'}},scales:{y:{beginAtZero:true,ticks:{color:'white'}},x:{ticks:{color:'white'}}}}
-      });
-
-    }
 
   })();
   </script>
