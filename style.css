@@ -6,7 +6,7 @@
     font-family: 'Roboto', sans-serif;
 }
 
-/* Full-page blurred background for small image */
+/* Full-page blurred background */
 body {
     display: flex;
     flex-direction: column;
@@ -14,10 +14,9 @@ body {
     color: #fff;
     position: relative;
     overflow: hidden;
-    background-color: #0f111a; /* fallback */
+    background-color: #0f111a;
 }
 
-/* Blurred full-screen layer */
 body::before {
     content: "";
     position: fixed;
@@ -31,11 +30,12 @@ body::before {
 
 /* Header */
 header {
-    background-color: rgba(28, 28, 28, 0.85);
+    background-color: rgba(28,28,28,0.85);
     display: flex;
     justify-content: center;
-    padding: 1rem 0;
-    z-index: 2;
+    padding: 1rem 10px;
+    z-index: 10;
+    position: relative;
 }
 
 header nav {
@@ -53,11 +53,12 @@ header nav a {
     font-weight: bold;
     text-decoration: none;
     transition: transform 0.2s, box-shadow 0.2s;
+    white-space: nowrap;
 }
 
 header nav a:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 108, 0, 0.5);
+    box-shadow: 0 4px 12px rgba(255,108,0,0.5);
 }
 
 /* Hero Section */
@@ -74,7 +75,7 @@ header nav a:hover {
 }
 
 .hero-content {
-    background: linear-gradient(135deg, rgba(0, 45, 100, 0.85), rgba(255, 60, 0, 0.85));
+    background: linear-gradient(135deg, rgba(0,45,100,0.85), rgba(255,60,0,0.85));
     padding: 2rem;
     border-radius: 15px;
     max-width: 400px;
@@ -110,7 +111,7 @@ header nav a:hover {
 
 /* Footer */
 footer {
-    background-color: rgba(28, 28, 28, 0.85);
+    background-color: rgba(28,28,28,0.85);
     color: #fff;
     padding: 2rem;
     text-align: center;
