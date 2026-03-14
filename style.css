@@ -27,7 +27,7 @@ display:flex;
 gap:1rem;
 }
 
-header nav button{
+header nav a{
 background:linear-gradient(90deg,#ff6b00,#ff3c00);
 border:none;
 color:#fff;
@@ -35,57 +35,13 @@ padding:0.6rem 1.2rem;
 border-radius:5px;
 cursor:pointer;
 font-weight:bold;
+text-decoration:none;
 transition:transform .2s,box-shadow .2s;
 }
 
-header nav button:hover{
+header nav a:hover{
 transform:translateY(-2px);
 box-shadow:0 4px 12px rgba(255,108,0,.5);
-}
-
-/* Hero Section */
-.hero{
-position:relative;
-background:url('Screenshot 2026-03-14 140800.png') center/cover no-repeat;
-height:90vh;
-display:flex;
-align-items:center;
-justify-content:flex-start;
-padding-left:5%;
-}
-
-.hero-content{
-background:linear-gradient(135deg,rgba(0,45,100,.85),rgba(255,60,0,.85));
-padding:2rem;
-border-radius:15px;
-max-width:400px;
-}
-
-.hero-content h2{
-font-size:2rem;
-margin-bottom:1rem;
-}
-
-.hero-content p{
-font-size:1rem;
-margin-bottom:1.5rem;
-line-height:1.5;
-}
-
-.hero-content button{
-background:#fff;
-color:#ff4d4f;
-border:none;
-padding:.6rem 1.2rem;
-border-radius:5px;
-font-weight:bold;
-cursor:pointer;
-transition:background .3s,transform .2s;
-}
-
-.hero-content button:hover{
-background:#ffe6e1;
-transform:translateY(-2px);
 }
 
 /* Footer */
@@ -96,59 +52,24 @@ padding:2rem;
 text-align:center;
 }
 
-footer p{
-margin-bottom:.5rem;
-}
-
-footer a{
-color:#ff6b00;
-text-decoration:none;
-margin:0 .5rem;
-}
-
-footer a:hover{
-text-decoration:underline;
-}
-
-/* Responsive */
-@media (max-width:768px){
-
-.hero{
-justify-content:center;
-text-align:center;
-padding-left:2%;
-padding-right:2%;
-}
-
-.hero-content{
-max-width:90%;
-}
-
-header nav{
-flex-wrap:wrap;
-justify-content:center;
-}
-
-}
-
 /* ================= MAP PAGE ================= */
 
 .pageLayout{
 display:flex;
-justify-content:center;
-align-items:center;
 width:100%;
 height:80vh;
+align-items:center;
+justify-content:center;
 }
 
-/* Side ad panels */
+/* Side panels for ads */
 .sidePanel{
 width:200px;
 background:#000;
 flex-shrink:0;
 }
 
-/* Map wrapper */
+/* Map container */
 .mapWrapper{
 flex:1;
 max-width:1100px;
@@ -158,7 +79,7 @@ justify-content:center;
 align-items:center;
 }
 
-/* Map size */
+/* Map */
 #map{
 width:100%;
 height:70vh;
@@ -166,7 +87,7 @@ border-radius:10px;
 overflow:hidden;
 }
 
-/* Search bar ON MAP */
+/* Search bar */
 .mapSearch{
 position:absolute;
 top:20px;
@@ -184,10 +105,9 @@ border:1px solid #555;
 background:#111;
 color:white;
 font-size:16px;
-box-shadow:0 0 6px #000;
 }
 
-/* Filters ON MAP */
+/* Filters */
 #filterContainer{
 position:absolute;
 bottom:20px;
