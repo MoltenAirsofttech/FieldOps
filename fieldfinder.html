@@ -1,41 +1,294 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Field Finder - Field Ops</title>
-  <link href="style.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Map - Field Ops</title>
+
+<link rel="stylesheet" href="style.css">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<style>
+body{
+    margin:0;
+    background:#0f1114;
+}
+
+#map{
+    width:100vw;
+    height:100vh;
+}
+</style>
 </head>
+
 <body>
-  <!-- Header -->
-  <div id="header-placeholder"></div>
 
-  <div class="pageContainer">
-    <div id="adsSidebar">
-      <h3>Ads</h3>
-      <p>Place your Google Ads here</p>
-    </div>
-    <div id="mainContent">
-      <div id="map"></div>
-      <div style="position:absolute; top:10px; left:50%; transform:translateX(-50%); width:320px;">
-        <input id="mapSearch" type="text" placeholder="Search location...">
-      </div>
-      <div id="filterContainer"></div>
-    </div>
-  </div>
+<header>
+<nav>
+<a href="index.html">Home</a>
+<a href="fieldmap.html">Field Map</a>
+<a href="groupfinder.html">Group Finder</a>
+<a href="fieldpass.html">Field Pass</a>
+<a href="login.html">Login / Signup</a>
+</nav>
+</header>
 
-  <!-- Footer -->
-  <div id="footer-placeholder"></div>
+<main>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-database-compat.js"></script>
-  <script src="fieldfinder-script.js"></script>
-  <script>
-    fetch('header.html').then(r => r.text()).then(d => document.getElementById('header-placeholder').innerHTML = d);
-    fetch('footer.html').then(r => r.text()).then(d => document.getElementById('footer-placeholder').innerHTML = d);
-  </script>
+<div id="map"></div>
+
+<div style="position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:1001; width:320px;">
+<input id="mapSearch" type="text" placeholder="Search location..." style="width:100%; padding:10px; border-radius:8px; border:1px solid #555; background:#111; color:white; font-size:16px; box-shadow:0 0 6px #000;">
+</div>
+
+<div id="filterContainer" style="position:absolute; bottom:60px; left:10px; z-index:1000; background:rgba(255,255,255,0.9); padding:10px; border-radius:8px; display:flex; flex-wrap:wrap; gap:4px;"></div>
+
+</main>
+
+<footer>
+<p>© Field Ops — Placeholder Footer</p>
+</footer>
+
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+(function() {
+
+const firebaseConfig = {
+apiKey: "AIzaSyClEyiSXHQ4Tjo8hUKpjlgbGz3Y9fw8ddg",
+authDomain: "fieldops0.firebaseapp.com",
+databaseURL: "https://fieldops0-default-rtdb.firebaseio.com",
+projectId: "fieldops0",
+storageBucket: "fieldops0.appspot.com",
+messagingSenderId: "368782923118",
+appId: "1:368782923118:web:71f392fee8c46fe1209d7f"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.database();
+
+let currentUser = null;
+let locations = [];
+let markers = [];
+
+const categoryColors = {
+"Airsoft Field":"blue",
+"Paintball Field":"red",
+"Store":"green",
+"Event":"orange"
+};
+
+let activeCategories = new Set(Object.keys(categoryColors));
+
+const map = L.map('map',{zoomControl:false}).setView([25,-80],5);
+
+L.tileLayer(
+'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+{
+attribution:'© OpenStreetMap © CARTO',
+subdomains:'abcd',
+maxZoom:19
+}).addTo(map);
+
+L.control.zoom({position:'bottomright'}).addTo(map);
+
+auth.onAuthStateChanged(user=>{
+currentUser=user||null;
+loadFields();
+});
+
+async function loadFields(){
+const snap = await db.ref('fields').once('value');
+const data = snap.val()||{};
+locations = Object.keys(data).map(k=>({id:k,...data[k]}));
+renderFilters();
+renderMarkers();
+}
+
+function createMarker(field){
+
+const tags = field.tags||[];
+const size = tags.includes("featured")?18:12;
+
+const htmlSlices = tags.map(tag=>
+`<div style="flex:1;background:${categoryColors[tag]||'gray'}"></div>`
+).join('');
+
+const iconHtml =
+`<div style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;display:flex;border:1px solid white;">${htmlSlices}</div>`;
+
+const marker = L.marker(
+[field.latitude,field.longitude],
+{
+icon:L.divIcon({
+className:'multi-circle',
+html:iconHtml,
+iconSize:[size,size],
+iconAnchor:[size/2,size/2]
+})
+});
+
+marker.bindPopup(`
+<div style="width:220px;font-family:Arial;">
+<strong>${field.name}</strong><br>
+<em>${field.avgPlayers||0} players (avg)</em>
+<p>${field.desc||''}</p>
+<button id="viewAnalyticsBtn" style="width:100%; padding:6px; border-radius:6px; background:#222; color:white; border:1px solid #555;">View Analytics</button>
+</div>
+`);
+
+marker.on('popupopen',()=>{
+const btn=document.getElementById('viewAnalyticsBtn');
+if(btn) btn.onclick=()=>showAnalytics(field);
+});
+
+return marker;
+}
+
+function renderMarkers(){
+
+markers.forEach(m=>map.removeLayer(m));
+markers=[];
+
+locations.forEach(field=>{
+
+const tags = field.tags || [];
+
+const visible = tags.some(tag=>activeCategories.has(tag));
+
+if(visible){
+
+const marker = createMarker(field);
+
+marker.addTo(map);
+
+markers.push(marker);
+
+}
+
+});
+
+}
+
+function renderFilters(){
+
+const container=document.getElementById('filterContainer');
+
+container.innerHTML='';
+
+Object.keys(categoryColors).forEach(tag=>{
+
+const btn=document.createElement('button');
+
+btn.innerText=tag;
+
+btn.style.background=activeCategories.has(tag)?categoryColors[tag]:'#ccc';
+
+btn.style.color=tag==='Event'?'black':'white';
+
+btn.style.border='none';
+
+btn.style.borderRadius='4px';
+
+btn.style.padding='4px 8px';
+
+btn.onclick=()=>{
+
+activeCategories.has(tag)
+?activeCategories.delete(tag)
+:activeCategories.add(tag);
+
+renderFilters();
+
+renderMarkers();
+
+};
+
+container.appendChild(btn);
+
+});
+
+}
+
+document.getElementById('mapSearch').addEventListener('keypress',async e=>{
+
+if(e.key==='Enter'){
+
+const res = await fetch(
+`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(e.target.value)}`
+);
+
+const data = await res.json();
+
+if(data[0]) map.setView([+data[0].lat,+data[0].lon],10);
+
+}
+
+});
+
+async function showAnalytics(field){
+
+if(!currentUser){
+alert('Login required');
+return;
+}
+
+const hasMembership = (
+await db.ref(`users/${currentUser.uid}/membership/active`).once('value')
+).val();
+
+if(!hasMembership){
+alert('Membership required');
+return;
+}
+
+const modal=document.createElement('div');
+
+modal.id='analyticsModal';
+
+modal.style.cssText=`
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+background:#111;
+z-index:9999;
+padding:20px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+overflow:auto;
+`;
+
+modal.innerHTML=`
+<button id="closeAnalytics" style="position:absolute;top:20px;left:20px;padding:10px 15px;background:#222;color:white;border:none;border-radius:6px;font-size:16px;">Back to Map</button>
+<h2 style="color:white;text-align:center;margin-top:0;margin-bottom:20px;">${field.name} Analytics</h2>
+<div style="display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;gap:20px;">
+<canvas id="avgPlayers" width="300" height="300"></canvas>
+<canvas id="playersPerDay" width="300" height="300"></canvas>
+<canvas id="playersPerHour" width="300" height="300"></canvas>
+<canvas id="combinedChart" width="300" height="300"></canvas>
+</div>
+`;
+
+document.body.appendChild(modal);
+
+document.getElementById('closeAnalytics').onclick=()=>modal.remove();
+
+}
+
+})();
+</script>
+
 </body>
 </html>
